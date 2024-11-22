@@ -34,13 +34,15 @@ CHIP CPU {
     PARTS:
 	//// Replace this comment with your code.
     // decode
+    // C命令(命令ビット列の15ビット目が1)のときに各ビットの対応を分かりやすくするため(命令ビット列の0ビット目はj3に対応するなど)の論理演算
+    // A命令(命令ビット列の15ビット目が0)のとき全ての全ての値は0になる
     And(a=instruction[15], b=instruction[0], out=j3);   // if out < 0
     And(a=instruction[15], b=instruction[1], out=j2);   // if out =0
     And(a=instruction[15], b=instruction[2], out=j1);   // if out > 0
-    And(a=instruction[15], b=instruction[3], out=writeM);   // save M
+    And(a=instruction[15], b=instruction[3], out=writeM);   // save M (writeM=d3)
     And(a=instruction[15], b=instruction[4], out=d2);   // save D
-    Not(in=instruction[15], out=d10);   // instruction A
-    And(a=instruction[15], b=instruction[5], out=d11);  // instruction C & d1=1
+    Not(in=instruction[15], out=d10);   // A命令のときd10=1
+    And(a=instruction[15], b=instruction[5], out=d11);  // C命令 & d1=1 のときd11=1
     Or(a=d10, b=d11, out=d1);   // save A
     And(a=instruction[15], b=instruction[6], out=c6);
     And(a=instruction[15], b=instruction[7], out=c5);
@@ -51,7 +53,7 @@ CHIP CPU {
     And(a=instruction[15], b=instruction[12], out=a);   // if a=0 then A, else if a=1 then M[A]
 
     Mux16(a=instruction, b=outALU, sel=instruction[15], out=inA);
-    ARegister(in=inA, load=d1, out[0..14]=addressM, out=outA, out=inPC);
+    ARegister(in=inA, load=d1, out[0..14]=addressM, out=outA, out=inPC);    // メモリアドレス15ビット目以降はScreenやKeyboradで使用
     Mux16(a=outA, b=inM, sel=a, out=AorM);
     DRegister(in=outALU, load=d2, out=D);
     ALU(x=D, y=AorM, zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outM, out=outALU, zr=zr, ng=ng);
@@ -68,7 +70,7 @@ CHIP CPU {
     Or(a=cj1, b=cj2, out=cj12);
     Or(a=cj12, b=cj3, out=cj);
     //  if nonjump then inc=1,load=0, else if jump then inc=0, load=1
-    Mux(a=true, b=false, sel=cj, out=inc);
-    Not(in=inc, out=load);
+    Mux(a=false, b=true, sel=cj, out=load);
+    Not(in=load, out=inc);
     PC(in=inPC, inc=inc, load=load, reset=reset, out[0..14]=pc);
 }
