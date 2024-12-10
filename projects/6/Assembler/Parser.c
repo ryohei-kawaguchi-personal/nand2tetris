@@ -5,11 +5,14 @@
 #include <ctype.h>
 #include <string.h>
 
+#define SYMBOL_SIZE 1000
+#define MNEMONIC_SIZE 10
+
 FILE *inputFile, *outputFile;
 char CURRENT_COMMAND[256];
 
 void Parser(const char* inputFilePath){
-    printf("inputFilePath=%s\n", inputFilePath);
+    // printf("inputFilePath=%s\n", inputFilePath);
     // 入力ファイルを開く
     inputFile = fopen(inputFilePath, "r");
     if (inputFile == NULL)
@@ -32,7 +35,7 @@ void Parser(const char* inputFilePath){
         strcat(outputFilePath, "hack");
     }
 
-    printf("outputFilePath=%s\n", outputFilePath);
+    // printf("outputFilePath=%s\n", outputFilePath);
 
     // 出力ファイルを開く（存在しない場合は作成）
     outputFile = fopen(outputFilePath, "w");
@@ -48,12 +51,12 @@ void Parser(const char* inputFilePath){
 // 入力にまだコマンドが存在するか
 bool hasMoreCommands()
 {
-    long current_position = ftell(inputFile); // 現在の位置を記録
+    long currentPosition = ftell(inputFile); // 現在の位置を記録
     if (fgets(CURRENT_COMMAND, sizeof(CURRENT_COMMAND), inputFile) == NULL)
     {
         return false;
     }
-    fseek(inputFile, current_position, SEEK_SET); // ファイル位置を元に戻す
+    fseek(inputFile, currentPosition, SEEK_SET); // ファイル位置を元に戻す
     return true;
 }
 
@@ -125,7 +128,7 @@ char *commandType()
 // commandTypeがA_COMMANDもしくはL_COMMANDのときのみ呼ばれる
 char *symbol()
 {
-    char symbol[16];
+    char symbol[SYMBOL_SIZE];
     char *symbolPointer = symbol + 1;
     strcpy(symbol, CURRENT_COMMAND);
 
@@ -137,14 +140,14 @@ char *symbol()
         *end = '\0'; // 見つかった位置で文字列を切る
     }
 
-    printf("aValue:%s\n", symbolPointer);
+    // printf("symbol:%s\n", symbolPointer);
     return symbolPointer;
 }
 
 // C命令のdestニーモニックを返す
 char *parserDest()
 {
-    static char mnemonic[256];
+    static char mnemonic[MNEMONIC_SIZE];
     strcpy(mnemonic, CURRENT_COMMAND);
 
     char *end = NULL;
@@ -158,14 +161,14 @@ char *parserDest()
     {
         *end = '\0'; // 見つかった位置で文字列を切る
     }
-    printf("dest:%s\n", mnemonic);
+    // printf("dest:%s\n", mnemonic);
     return mnemonic;
 }
 
 // C命令のcompニーモニックを返す
 char *parserComp()
 {
-    static char mnemonic[256];
+    static char mnemonic[MNEMONIC_SIZE];
     strcpy(mnemonic, CURRENT_COMMAND);
 
     char *start = NULL;
@@ -181,17 +184,17 @@ char *parserComp()
 
     if (start != NULL)
     {
-        printf("comp:%s\n", start + 1);
+        // printf("comp:%s\n", start + 1);
         return start + 1;
     }
-    printf("comp:%s\n", mnemonic);
+    // printf("comp:%s\n", mnemonic);
     return mnemonic;
 }
 
 // C命令のjumpニーモニックを返す
 char *parserJump()
 {
-    static char mnemonic[256];
+    static char mnemonic[MNEMONIC_SIZE];
     strcpy(mnemonic, CURRENT_COMMAND);
     char *start = NULL;
 
@@ -200,6 +203,6 @@ char *parserJump()
     {
         return "null";
     }
-    printf("jump:%s\n", start + 1);
+    // printf("jump:%s\n", start + 1);
     return start + 1;
 }

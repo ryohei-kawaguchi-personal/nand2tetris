@@ -43,7 +43,7 @@ char *codeDest(char *mnemonic)
         printf("unknown dest was entered.");
         exit(EXIT_FAILURE);
     }
-    printf("destBinary:%s\n", dest);
+    // printf("destBinary:%s\n", dest);
     return dest;
 }
 
@@ -167,7 +167,7 @@ char *codeComp(char *mnemonic)
         printf("unknown comp was entered.");
         exit(EXIT_FAILURE);
     }
-    printf("compBinary:%s\n", comp);
+    // printf("compBinary:%s\n", comp);
     return comp;
 }
 
@@ -212,6 +212,6 @@ char *codeJump(char *mnemonic)
         printf("unknown jump was entered.");
         exit(EXIT_FAILURE);
     }
-    printf("jumpBinary:%s\n", jump);
+    // printf("jumpBinary:%s\n", jump);
     return jump;
 }
